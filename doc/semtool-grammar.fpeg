@@ -1,0 +1,61 @@
+version 1
+
+# use the standard values here:
+VARIABLE        = '$' NAME
+PLACEHOLDER     = '_'
+ESCAPE          = '\\'
+
+# here comes the real grammar:
+GRAMMAR         = Spacing Version Rule+ EOF
+Version(safeSpot) = 'version' MustSpacing INTEGER Spacing
+Rule	        = Identifier Options? Assign Expression
+Options(ignore) = Open AstOption ,* Comma Close
+Expression      = Sequence ,+ Slash
+Sequence	    = Subsequence+
+Subsequence	    = PrefixOp? Suffix
+Suffix		    = Primary InfixOp Primary
+                 / Primary PostfixOp?
+Primary		    = Identifier !Assign
+		         / Open Expression Close
+		         / Literal
+		         / Class
+		         / Dot
+
+# ... and now the lexical part:
+Identifier      = NAME
+PrefixOp        = And / Not / RightArrow
+InfixOp         = CommaStar / CommaPlus / SemiStar / SemiPlus
+PostfixOp       = Question / Star / Plus
+Literal		    = "'" (!"'" Char )* "'" Spacing
+		         / '"' (!'"' Char )* '"' Spacing
+Class		    = '[' (!']' Range)* ']' Spacing
+Range		    = RangeChar '-' RangeChar / RangeChar
+RangeChar       = '\\[' / '\\]' / !('[' / ']') Char
+Char		    = '\\' [abefnrtv'"\\]
+                 / '\\' "u"[0-9a-fA-F]+
+                 / '\\' "x"[0-9a-fA-F]+
+		         / '\\' [0-3][0-7][0-7]
+		         / '\\' [0-7][0-7]?
+		         / '\\' '-'
+		         / !'\\' .
+Assign	    	= '=' Spacing
+Slash	    	= '/' Spacing
+And		        = '&' Spacing
+Not		        = '!' Spacing
+RightArrow	    = '->' Spacing
+Question    	= '?' Spacing
+Star	        = '*' Spacing
+Plus		    = '+' Spacing
+CommaStar	    = ',*' Spacing
+CommaPlus		= ',+' Spacing
+SemiStar	    = ',*' Spacing
+SemiPlus		= ',+' Spacing
+Open		    = '(' Spacing
+Close		    = ')' Spacing
+Dot             = '.' Spacing
+Comma           = ',' Spacing
+AstOption(safeSpot)     = ('ignore' / 'existence' / 'safeSpot' / 'binary') Spacing
+Spacing(ignore)	    	= SpaceComment* { ignore }
+MustSpacing(existence)  = SpaceComment+ { existence }
+SpaceComment	        = (MUST_SPACE / Comment)
+Comment		            = '#' -> EOL
