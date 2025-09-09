@@ -6,56 +6,57 @@ PLACEHOLDER     = '_'
 ESCAPE          = '\\'
 
 # here comes the real grammar:
-GRAMMAR         = Spacing Version Rule+ EOF
-Version(safeSpot) = 'version' MustSpacing INTEGER Spacing
-Rule	        = Identifier Options? Assign Expression
-Options(ignore) = Open AstOption ,* Comma Close
-Expression      = Sequence ,+ Slash
-Sequence	    = Subsequence+
-Subsequence	    = PrefixOp? Suffix
-Suffix		    = Primary InfixOp Primary
-                 / Primary PostfixOp?
-Primary		    = Identifier !Assign
-		         / Open Expression Close
-		         / Literal
-		         / Class
-		         / Dot
+GRAMMAR                 = Spacing Version Rule+ EOF ;;
+Version<safeSpot>       = 'version' MustSpacing INTEGER Spacing ;;
+Rule	                = Identifier Options? Assign Expression RuleEnd ;;
+Options<ignore>         = Begin AstOption ,+ Comma End ;;
+Expression              = Sequence ,+ Slash ;;
+Sequence	            = Subsequence+ ;;
+Subsequence	            = Primary PostfixOp? InfixOp Primary PostfixOp?
+                         / PrefixOp? Primary PostfixOp? ;;
+Primary		            = Identifier
+		                 / Open Expression Close
+		                 / Literal
+		                 / Class
+		                 / Dot ;;
 
 # ... and now the lexical part:
-Identifier      = NAME
-PrefixOp        = And / Not / RightArrow
-InfixOp         = CommaStar / CommaPlus / SemiStar / SemiPlus
-PostfixOp       = Question / Star / Plus
-Literal		    = "'" (!"'" Char )* "'" Spacing
-		         / '"' (!'"' Char )* '"' Spacing
-Class		    = '[' (!']' Range)* ']' Spacing
-Range		    = RangeChar '-' RangeChar / RangeChar
-RangeChar       = '\\[' / '\\]' / !('[' / ']') Char
-Char		    = '\\' [abefnrtv'"\\]
-                 / '\\' "u"[0-9a-fA-F]+
-                 / '\\' "x"[0-9a-fA-F]+
-		         / '\\' [0-3][0-7][0-7]
-		         / '\\' [0-7][0-7]?
-		         / '\\' '-'
-		         / !'\\' .
-Assign	    	= '=' Spacing
-Slash	    	= '/' Spacing
-And		        = '&' Spacing
-Not		        = '!' Spacing
-RightArrow	    = '->' Spacing
-Question    	= '?' Spacing
-Star	        = '*' Spacing
-Plus		    = '+' Spacing
-CommaStar	    = ',*' Spacing
-CommaPlus		= ',+' Spacing
-SemiStar	    = ',*' Spacing
-SemiPlus		= ',+' Spacing
-Open		    = '(' Spacing
-Close		    = ')' Spacing
-Dot             = '.' Spacing
-Comma           = ',' Spacing
-AstOption(safeSpot)     = ('ignore' / 'existence' / 'safeSpot' / 'binary') Spacing
-Spacing(ignore)	    	= SpaceComment* { ignore }
-MustSpacing(existence)  = SpaceComment+ { existence }
-SpaceComment	        = (MUST_SPACE / Comment)
-Comment		            = '#' -> EOL
+Identifier              = NAME Spacing ;;
+PrefixOp                = (And / Not / RightArrow) Spacing ;;
+InfixOp                 = (CommaStar / CommaPlus / SemiStar / SemiPlus) Spacing ;;
+PostfixOp               = (Question / Star / Plus) Spacing ;;
+Literal		            = "'" (!"'" ("\\'" / Char) )+ "'" Spacing
+		                 / '"' (!'"' ('\\"' / Char) )+ '"' Spacing ;;
+Class		            = '[' (!']' Range)+ ']' Spacing ;;
+Range		            = RangeChar '-' RangeChar / RangeChar ;;
+RangeChar               = '\\[' / '\\]' / '\\-' / !('[' / ']' / '-') Char ;;
+Char		            = '\\' [abefnrtv\\]
+		                 / '\\' [0-3][0-7][0-7]
+	                     / '\\' "x"[0-9a-fA-F][0-9a-fA-F]
+	                     / '\\' "u"[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+	                     / '\\' "U"[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]
+		                 / !'\\' . ;;
+RuleEnd 		        = ';;' Spacing ;;
+Assign	    	        = '=' Spacing ;;
+Slash	    	        = '/' Spacing ;;
+And		                = '&' Spacing ;;
+Not		                = '!' Spacing ;;
+RightArrow	            = '->' Spacing ;;
+Question    	        = '?' Spacing ;;
+Star	                = '*' Spacing ;;
+Plus		            = '+' Spacing ;;
+CommaStar	            = ',*' Spacing ;;
+CommaPlus		        = ',+' Spacing ;;
+SemiStar	            = ',*' Spacing ;;
+SemiPlus		        = ',+' Spacing ;;
+Open		            = '(' Spacing ;;
+Close		            = ')' Spacing ;;
+Dot                     = '.' Spacing ;;
+Comma                   = ',' Spacing ;;
+Begin   	            = '<' Spacing ;;
+End 		            = '>' Spacing ;;
+AstOption<safeSpot>     = ('ignore' / 'existence' / 'safeSpot' / 'binary' / 'text') Spacing ;;
+Spacing<ignore>	    	= SpaceComment* ;;
+MustSpacing<existence>  = SpaceComment+ ;;
+SpaceComment	        = (MUST_SPACE / Comment) ;;
+Comment		            = '#' -> EOL ;;

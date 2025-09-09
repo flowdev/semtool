@@ -35,7 +35,7 @@ Tool for semantic actions on any language or file format driven by PEG grammars.
 ### Predifined rules
 
 - `EOF` parses the end of the input.
-- `EOL` parses the end of a line (`'\r`, `'\n'` or `'\r\n'`).
+- `EOL` parses the end of a line (`'\r\n', `'\n'` or `'\r``).
 - `FLOAT` parses a floating point number (without a sign).
 - `INTEGER` parses an integer number (without a sign).
 - `SPACE` parses any amount of Unicode whitespace (including none).
@@ -46,8 +46,11 @@ Tool for semantic actions on any language or file format driven by PEG grammars.
 
 - `ALPHA` parses a Unicode letter.
 - `DIGIT` parses a Unicode digit or number.
-- `WORD` is `ALPHA` and `DIGIT` combined into a single class.
+- `WORDO` is `ALPHA` and `DIGIT` plus `_` combined into a single class.
 
+The names of these character classes are deliberately chosen to contain a double vowel.
+So they aren't reasonable character classes
+(for example `[WORD]` is a reasonable character class but `[WORDO]` isn't).
 
 ### Rules a user has to define
 
