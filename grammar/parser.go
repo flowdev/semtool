@@ -19,12 +19,12 @@ var predefinedRules = map[string]rule{
 	"VARIABLE":    {name: "VARIABLE", rhs: variableRuleRHS{}, safeSpot: true},
 	"PLACEHOLDER": {name: "PLACEHOLDER", rhs: placeholderRuleRHS{}},
 	"ESCAPE":      {name: "ESCAPE", rhs: escapeRuleRHS{}},
-	"EOF":         {name: "EOF", rhs: nameRuleRHS{}, ignore: true},
-	"EOL":         {name: "EOL", rhs: nameRuleRHS{}, existence: true},
-	"FLOAT":       {name: "FLOAT", rhs: nameRuleRHS{}, safeSpot: true},
-	"INTEGER":     {name: "INTEGER", rhs: nameRuleRHS{}, safeSpot: true},
-	"SPACE":       {name: "SPACE", rhs: nameRuleRHS{}, ignore: true},
-	"MUST_SPACE":  {name: "MUST_SPACE", rhs: nameRuleRHS{}, existence: true},
+	"EOF":         {name: "EOF", rhs: eofRuleRHS{}, ignore: true},
+	"EOL":         {name: "EOL", rhs: eolRuleRHS{}, existence: true},
+	"FLOAT":       {name: "FLOAT", rhs: floatRuleRHS{}, safeSpot: true},
+	"INTEGER":     {name: "INTEGER", rhs: integerRuleRHS{}, safeSpot: true},
+	"SPACE":       {name: "SPACE", rhs: spaceRuleRHS{}, ignore: true},
+	"MUST_SPACE":  {name: "MUST_SPACE", rhs: mspaceRuleRHS{}, existence: true},
 	"NAME":        {name: "NAME", rhs: nameRuleRHS{}},
 }
 
@@ -398,7 +398,7 @@ func parsePrimary() comb.Parser[primary] {
 						func(r1 rune, _ rune, r2 rune) (class, error) {
 							return class{ranges: [][]rune{{r1, r2}}}, nil
 						}),
-					// RangeChar = '\\[' / '\\]' / '\\-' / '\\"' / "\\'" / !('[' / ']' / '-') Char ;;
+					// RangeChar = '\\[' / '\\]' / '\\-' / !('[' / ']' / '-') Char ;;
 					cmb.Map(cmb.QuotedChar("range character", "[]-", "[]-"),
 						func(r rune) (class, error) {
 							return class{singleRangeChars: []rune{r}}, nil
@@ -555,7 +555,7 @@ type floatRuleRHS struct{}
 func (floatr floatRuleRHS) parser(
 	withSemtoolRules bool, inputType ast.InputType, allRules map[string]rule,
 ) comb.Parser[*ast.Node] {
-	return cmb.Map(cmb.Float(false, 10, false), func(float string) (*ast.Node, error) {
+	return cmb.Map(cmb.Float(false, 10, false, true), func(float string) (*ast.Node, error) {
 		return &ast.Node{OutputType: ast.NodeText, Text: float}, nil
 	})
 }

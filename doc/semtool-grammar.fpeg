@@ -25,8 +25,8 @@ Identifier              = NAME Spacing ;;
 PrefixOp                = (And / Not / RightArrow) Spacing ;;
 InfixOp                 = (CommaStar / CommaPlus / SemiStar / SemiPlus) Spacing ;;
 PostfixOp               = (Question / Star / Plus) Spacing ;;
-Literal		            = "'" (!"'" ("\\'" / Char) )+ "'" Spacing
-		                 / '"' (!'"' ('\\"' / Char) )+ '"' Spacing ;;
+Literal		            = "'" ("\\'" / !"'" Char)+ "'" Spacing
+		                 / '"' ('\\"' / !'"' Char)+ '"' Spacing ;;
 Class		            = '[' (!']' Range)+ ']' Spacing ;;
 Range		            = RangeChar '-' RangeChar / RangeChar ;;
 RangeChar               = '\\[' / '\\]' / '\\-' / !('[' / ']' / '-') Char ;;
